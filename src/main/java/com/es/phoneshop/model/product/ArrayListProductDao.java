@@ -4,34 +4,37 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 public class ArrayListProductDao implements ProductDao {
     private long maxId;
-    private List<Product> products;
-    private ReadWriteLock lock;
+    private final List<Product> products;
+    private final ReadWriteLock lock;
+    private final Lock readLock;
+    private final Lock writeLock;
 
     public ArrayListProductDao() {
         lock = new ReentrantReadWriteLock();
+        readLock = lock.readLock();
+        writeLock = lock.writeLock();
         products = new ArrayList<>();
         saveSampleProducts();
     }
 
     @Override
-    public Product getProduct(Long id) {
-        lock.readLock().lock();
-        Product result = null;
+    public Product getProduct(Long id) throws ProductNotFoundException {
+        readLock.lock();
+        Product result;
         try {
             result = products.stream()
                     .filter(product -> id.equals(product.getId()))
                     .findAny()
                     .orElseThrow(ProductNotFoundException::new);
-        } catch (ProductNotFoundException e) {
-            e.printStackTrace();
         } finally {
-            lock.readLock().unlock();
+            readLock.unlock();
         }
         return result;
     }
@@ -42,8 +45,7 @@ public class ArrayListProductDao implements ProductDao {
         List<Product> result;
         try {
             result = products.stream()
-                    .filter(product -> product.getPrice() != null)
-                    .filter(this::productIsInStock)
+                    .filter(product -> product.getPrice() != null && productIsInStock(product))
                     .collect(Collectors.toList());
         } finally {
             lock.readLock().unlock();
@@ -57,32 +59,26 @@ public class ArrayListProductDao implements ProductDao {
 
     @Override
     public void save(Product product) {
-        lock.writeLock().lock();
-
+        writeLock.lock();
+        try {
             if (product.getId() == null) {
                 product.setId(maxId++);
             }
             products.add(product);
-
-            lock.writeLock().unlock();
-
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @Override
-    public void delete(Long id) {
-        lock.writeLock().lock();
-        Product result = null;
+    public void delete(Long id) throws ProductNotFoundException {
+        writeLock.lock();
         try {
-            result = products.stream()
-                    .filter(product -> id.equals(product.getId()))
-                    .findAny()
-                    .orElseThrow(ProductNotFoundException::new);
-        } catch (ProductNotFoundException e) {
-            e.printStackTrace();
+            Product product = getProduct(id);
+            products.remove(product);
         } finally {
-            lock.writeLock().unlock();
+            writeLock.unlock();
         }
-        products.remove(result);
     }
 
     private void saveSampleProducts() {
