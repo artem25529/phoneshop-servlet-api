@@ -53,20 +53,19 @@ public class ArrayListProductDao implements ProductDao {
         lock.readLock().lock();
         List<Product> result;
         try {
-            Comparator<Product> comparator = getComparator(sortField);
+            Comparator<Product> comparator = getComparator(query, sortField, sortOrder);
             result = products.stream()
-                    .filter(product -> query == null || query.isEmpty() || queryMatchesProduct(query, product))
+                    .filter(product -> query == null || query.isEmpty() || queryMatchesDescription(query, product))
                     .filter(product -> product.getPrice() != null && productIsInStock(product))
-                    .sorted(SortOrder.asc == sortOrder ? comparator : comparator.reversed())
+                    .sorted(comparator)
                     .collect(Collectors.toList());
-            result.sort(getSearchComparator(query).reversed());
         } finally {
             lock.readLock().unlock();
         }
         return result;
     }
 
-    private Comparator<Product> getComparator(SortField sortField) {
+    private Comparator<Product> getComparator(String query, SortField sortField, SortOrder sortOrder) {
         Comparator<Product> comparator = Comparator.comparing(product -> {
             if (sortField == SortField.description) {
                 return (Comparable) product.getDescription();
@@ -74,8 +73,8 @@ public class ArrayListProductDao implements ProductDao {
                 return (Comparable) product.getPrice();
             }
         });
-
-        return comparator;
+        if (query != null && !query.equals("")) return getSearchComparator(query).reversed();
+        return sortOrder == SortOrder.asc ? comparator : comparator.reversed();
     }
 
     private Comparator<Product> getSearchComparator(String query) {
@@ -117,15 +116,14 @@ public class ArrayListProductDao implements ProductDao {
         }
     }
 
-    private boolean queryMatchesProduct(String query, Product product) {
-        query = query.toLowerCase();
+    private boolean queryMatchesDescription(String query, Product product) {
+        String[] words = query.trim().toLowerCase().split("\\s");
         String description = product.getDescription().toLowerCase();
-        String[] words = query.split(" ");
-        for (int i = 0; i < words.length; i++) {
-            if (description.contains(words[i])) {
+        for (String word : words) {
+            Pattern pattern = Pattern.compile("(^" + word + "\\s)|(\\s" + word + "\\s)|(\\s" + word + "$)");
+            Matcher matcher = pattern.matcher(description);
+            if (matcher.find()) {
                 return true;
-            } else if (i < words.length - 1) {
-                description = description.substring(description.indexOf(' ') + 1);
             }
         }
         return false;
