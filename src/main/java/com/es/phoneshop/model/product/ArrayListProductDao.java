@@ -72,6 +72,7 @@ public class ArrayListProductDao implements ProductDao {
             } else {
                 return (Comparable) product.getPrice();
             }
+
         });
         if (query != null && !query.equals("")) return getSearchComparator(query).reversed();
         return sortOrder == SortOrder.asc ? comparator : comparator.reversed();
