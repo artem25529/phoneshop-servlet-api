@@ -18,14 +18,14 @@ public class ArrayListProductDaoTest
 
     @Before
     public void setup() {
-        productDao = new ArrayListProductDao();
+        productDao = ArrayListProductDao.getInstance();
         Currency usd = Currency.getInstance("USD");
         testProduct = new Product("test-product", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg");
     }
 
     @Test
     public void testFindProductsNoResults() {
-        assertFalse(productDao.findProducts().isEmpty());
+        assertFalse(productDao.findProducts(null, null, null).isEmpty());
     }
 
     @Test
@@ -39,7 +39,7 @@ public class ArrayListProductDaoTest
 
     @Test
     public void testProductWithZeroStock() {
-        List<Product> products = productDao.findProducts();
+        List<Product> products = productDao.findProducts(null, null, null);
         long count = products.stream()
                 .filter(product -> product.getStock() == 0)
                 .count();

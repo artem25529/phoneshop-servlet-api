@@ -1,6 +1,12 @@
 package com.es.phoneshop.model.product;
 
-public class ProductNotFoundException extends Exception{
+public class ProductNotFoundException extends RuntimeException{
+    private Long id;
+
+    public ProductNotFoundException (Long id) {
+        this.id = id;
+    }
+
     public ProductNotFoundException(){
 
     }
@@ -8,5 +14,11 @@ public class ProductNotFoundException extends Exception{
     public ProductNotFoundException(String message) {
         super(message);
     }
+
+    public Long getId() {
+        return id;
+    }
+
+
 
 }
