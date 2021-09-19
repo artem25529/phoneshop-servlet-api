@@ -19,30 +19,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ProductDetailsPageServletTest {
-
     @Mock
     private HttpServletRequest request;
-
     @Mock
     private HttpServletResponse response;
-
     @Mock
     private RequestDispatcher requestDispatcher;
-
     @Mock
     private ServletConfig config;
-
     @Mock
     private ServletContextEvent event;
-
     @Mock
     private ServletContext context;
-
     DemoDataServletContextListener listener = new DemoDataServletContextListener();
-
     private final ProductDetailsPageServlet servlet = new ProductDetailsPageServlet();
-
-
 
     @Before
     public void setUp() throws Exception {

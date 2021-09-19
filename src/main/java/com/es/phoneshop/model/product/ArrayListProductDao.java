@@ -74,7 +74,7 @@ public class ArrayListProductDao implements ProductDao {
             }
 
         });
-        if (query != null && !query.equals("")) return getSearchComparator(query).reversed();
+        if (sortField == null && query != null && !query.isEmpty()) return getSearchComparator(query).reversed();
         return sortOrder == SortOrder.asc ? comparator : comparator.reversed();
     }
 
