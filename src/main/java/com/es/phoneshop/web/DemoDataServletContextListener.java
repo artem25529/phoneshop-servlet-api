@@ -37,7 +37,7 @@ public class DemoDataServletContextListener implements ServletContextListener {
 
     private void saveSampleProducts() {
         Currency usd = Currency.getInstance("USD");
-        productDao.save(new Product("sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 100, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg", Arrays.asList(new PriceHistory(new GregorianCalendar(2021, Calendar.JANUARY, 12).getTime(), new BigDecimal(120)), new PriceHistory(new GregorianCalendar(2021, Calendar.AUGUST, 12).getTime(), new BigDecimal(123)))));
+        productDao.save(new Product("sgs", "Samsung Galaxy S", new BigDecimal(100), usd, 1000, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg", Arrays.asList(new PriceHistory(new GregorianCalendar(2021, Calendar.JANUARY, 12).getTime(), new BigDecimal(120)), new PriceHistory(new GregorianCalendar(2021, Calendar.AUGUST, 12).getTime(), new BigDecimal(123)))));
         productDao.save(new Product("sgs2", "Samsung Galaxy S II", new BigDecimal(200), usd, 0, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg"));
         productDao.save(new Product("sgs3", "Samsung Galaxy S III", new BigDecimal(300), usd, 5, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20III.jpg"));
         productDao.save(new Product("iphone", "Apple iPhone", new BigDecimal(200), usd, 10, "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone.jpg"));

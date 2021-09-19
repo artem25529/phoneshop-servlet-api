@@ -11,20 +11,19 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ArrayListProductDao implements ProductDao {
-    private static ProductDao instance;
-
-    public static synchronized ProductDao getInstance() {
-        if (instance == null) {
-            instance = new ArrayListProductDao();
-        }
-        return instance;
-    }
-
     private long maxId;
     private final List<Product> products;
     private final ReadWriteLock lock;
     private final Lock readLock;
     private final Lock writeLock;
+
+    private static class SingleTonHelper {
+        private static final ProductDao INSTANCE = new ArrayListProductDao();
+    }
+
+    public static ProductDao getInstance() {
+        return SingleTonHelper.INSTANCE;
+    }
 
     private ArrayListProductDao() {
         lock = new ReentrantReadWriteLock();

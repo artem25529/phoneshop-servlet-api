@@ -4,12 +4,13 @@
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 
 <jsp:useBean id="products" type="java.util.ArrayList" scope="request"/>
+<jsp:useBean id="recentlyViewedProducts" type="java.util.ArrayList" scope="session"/>
 <tags:master pageTitle="Product List">
   <p>
     Welcome to Expert-Soft training!
   </p>
   <form>
-      <input name="query" value="${param.query}">
+      <input name="query" value="${param.query}" placeholder="Search product...">
       <button>Search</button>
   </form>
 
@@ -45,4 +46,23 @@
       </tr>
     </c:forEach>
   </table>
+  <c:choose>
+    <c:when test="${recentlyViewedProducts.size() == 0}">
+      <p>There isn't any products viewed recently</p>
+    </c:when>
+    <c:otherwise>
+      <p>Recently viewed:</p>
+      <c:forEach var="product" items="${recentlyViewedProducts}">
+        <div class="recentlyViewedProduct">
+          <img src="${product.imageUrl}" class="product-tile" alt="not supported">
+          <a href="${pageContext.servletContext.contextPath}/products/${product.id}">
+              ${product.description}
+          </a><br>
+          <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="${product.currency.symbol}"/>
+        </div>
+      </c:forEach>
+    </c:otherwise>
+  </c:choose>
+
+
 </tags:master>
