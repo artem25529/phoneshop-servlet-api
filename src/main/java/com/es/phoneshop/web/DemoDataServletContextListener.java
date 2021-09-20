@@ -26,8 +26,6 @@ public class DemoDataServletContextListener implements ServletContextListener {
         if (insertDemoData) {
             saveSampleProducts();
         }
-
-
     }
 
     @Override

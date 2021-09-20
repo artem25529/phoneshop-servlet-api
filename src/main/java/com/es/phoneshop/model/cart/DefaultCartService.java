@@ -5,12 +5,11 @@ import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 public class DefaultCartService implements CartService {
     private static final String CART_SESSION_ATTRIBUTE = DefaultCartService.class.getName() + ".cart";
-    private ProductDao productDao;
+    private final ProductDao productDao;
 
     private DefaultCartService() {
         productDao = ArrayListProductDao.getInstance();
@@ -35,22 +34,21 @@ public class DefaultCartService implements CartService {
 
     @Override
     public synchronized void add(Cart cart, Long productId, int quantity) throws OutOfStockException {
-        Product product = productDao.getProduct(productId);
-        if (product.getStock() < quantity) {
-            throw new OutOfStockException(product, quantity, product.getStock());
-        }
-        CartItem newItem = new CartItem(product, quantity);
         List<CartItem> items = cart.getItems();
-        if (items.contains(newItem)) {
-            int index = items.indexOf(newItem);
+        Product product = productDao.getProduct(productId);
+        CartItem newItem = new CartItem(product, quantity);
+        int index;
+        if ((index = items.indexOf(newItem)) != -1) {
             CartItem oldItem = items.get(index);
-
-            items.set(index, new CartItem(product, oldItem.getQuantity() + newItem.getQuantity()));
+            if (oldItem.getQuantity() + quantity > product.getStock()) {
+                throw new OutOfStockException(product, quantity, product.getStock() - oldItem.getQuantity());
+            }
+            oldItem.setQuantity(oldItem.getQuantity() + quantity);
         } else {
-            items.add(new CartItem(product, quantity));
+            if (quantity > product.getStock()) {
+                throw new OutOfStockException(product, quantity, product.getStock());
+            }
+            items.add(newItem);
         }
-        product.setStock(product.getStock() - quantity);
-
-
     }
 }

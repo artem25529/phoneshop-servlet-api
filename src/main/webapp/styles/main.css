@@ -44,6 +44,15 @@ img.product-tile {
   text-align: center;
 }
 
+td.info {
+  border: white;
+  padding: 5px;
+}
+
+table.info {
+  border: white;
+}
+
 /* Page specific styles */
 body.product-list {
 

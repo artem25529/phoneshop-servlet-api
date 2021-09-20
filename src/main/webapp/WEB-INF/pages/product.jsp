@@ -16,7 +16,7 @@
     </c:if>
     <c:if test="${not empty error}">
         <div class="error">
-                There wa an error adding to cart
+            There wa an error adding to cart
         </div>
     </c:if>
     <p>${product.description}</p>
@@ -53,7 +53,7 @@
                     <input name="quantity" value="${not empty error ? param.quantity : 1}" class="quantity">
                     <c:if test="${not empty error}">
                         <div class="error">
-                            ${error}
+                                ${error}
                         </div>
                     </c:if>
                 </td>
@@ -66,16 +66,25 @@
             <p>There isn't any products viewed recently</p>
         </c:when>
         <c:otherwise>
-            <p>Recently viewed:</p>
-            <c:forEach var="product" items="${recentlyViewedProducts}">
-                <div class="recentlyViewedProduct">
-                    <img src="${product.imageUrl}" class="product-tile" alt="not supported">
-                    <a href="${pageContext.servletContext.contextPath}/products/${product.id}"><br>
-                            ${product.description}
-                    </a>
-                    <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="${product.currency.symbol}"/>
-                </div>
-            </c:forEach>
+            <table class="info">
+                <caption>
+                    Recently viewed
+                </caption>
+                <tr>
+                    <c:forEach var="product" items="${recentlyViewedProducts}">
+                        <td class="info">
+                            <div class="recentlyViewedProduct">
+                                <img src="${product.imageUrl}" class="product-tile" alt="not supported">
+                                <a href="${pageContext.servletContext.contextPath}/products/${product.id}"><br>
+                                        ${product.description}
+                                </a>
+                                <fmt:formatNumber value="${product.price}" type="currency"
+                                                  currencySymbol="${product.currency.symbol}"/>
+                            </div>
+                        </td>
+                    </c:forEach>
+                </tr>
+            </table>
         </c:otherwise>
     </c:choose>
 

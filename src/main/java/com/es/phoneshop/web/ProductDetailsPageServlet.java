@@ -7,7 +7,6 @@ import com.es.phoneshop.model.cart.OutOfStockException;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
-import com.es.phoneshop.model.product.ProductNotFoundException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -52,18 +51,16 @@ public class ProductDetailsPageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long productId = parseProductId(request);
         String quantityString = request.getParameter("quantity");
+        Cart cart = cartService.getCart(request);
         int quantity;
         try {
             NumberFormat format = NumberFormat.getInstance(request.getLocale());
             quantity = format.parse(quantityString).intValue();
+            cartService.add(cart, productId, quantity);
         } catch (ParseException e) {
             request.setAttribute("error", "Not a number");
             doGet(request, response);
             return;
-        }
-        Cart cart = cartService.getCart(request);
-        try {
-            cartService.add(cart, productId, quantity);
         } catch (OutOfStockException e) {
             request.setAttribute("error", "Out of stock, available: " + e.getStockAvailable());
             doGet(request, response);
