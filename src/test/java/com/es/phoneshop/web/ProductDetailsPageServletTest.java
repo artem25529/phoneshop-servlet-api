@@ -10,6 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -31,7 +32,10 @@ public class ProductDetailsPageServletTest {
     private ServletContextEvent event;
     @Mock
     private ServletContext context;
-    DemoDataServletContextListener listener = new DemoDataServletContextListener();
+    @Mock
+    private HttpSession session;
+
+    private DemoDataServletContextListener listener = new DemoDataServletContextListener();
     private final ProductDetailsPageServlet servlet = new ProductDetailsPageServlet();
 
     @Before
@@ -43,6 +47,7 @@ public class ProductDetailsPageServletTest {
         servlet.init(config);
         when(request.getPathInfo()).thenReturn("/1");
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
+        when(request.getSession()).thenReturn(session);
     }
 
     @Test

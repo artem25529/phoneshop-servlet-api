@@ -7,7 +7,6 @@ import com.es.phoneshop.model.cart.OutOfStockException;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
-import com.es.phoneshop.model.product.feature.RecentlyViewedProductsService;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -17,11 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 
-public class ProductDetailsPageServlet extends HttpServlet {
+public class CartPageServlet extends HttpServlet {
     private ProductDao productDao;
+
     private CartService cartService;
 
     @Override
@@ -33,33 +34,32 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Long productId = parseProductId(request);
-        RecentlyViewedProductsService instance = RecentlyViewedProductsService.getInstance();
-        List<Product> recentlyViewedProducts = instance.getRecentlyViewedProducts(request);
-        instance.add(productId, recentlyViewedProducts);
         request.setAttribute("cart", cartService.getCart(request));
-        request.setAttribute("product", productDao.getProduct(productId));
-        if (request.getParameter("updateFromSearchPage") != null) {
-            response.sendRedirect(request.getContextPath() + "/products");
-        } else {
-            request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
-        }
+        request.getRequestDispatcher("/WEB-INF/pages/cart.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Long productId = parseProductId(request);
-        String quantityString = request.getParameter("quantity");
+        String[] productIds = request.getParameterValues("productId");
+        String[] quantities = request.getParameterValues("quantity");
+        Map<Long, String> errors = new HashMap<>();
         Cart cart = cartService.getCart(request);
-        int quantity;
-        try {
-            quantity = getQuantity(quantityString, request);
-            cartService.add(cart, productId, quantity);
-        } catch (ParseException | OutOfStockException e) {
-            handleError(e, request, response);
-            return;
+        for (int i = 0; i < productIds.length; i++) {
+            Long productId = Long.valueOf(productIds[i]);
+            int quantity;
+            try {
+                quantity = getQuantity(quantities[i], request);
+                cartService.update(cart, productId, quantity);
+            } catch (ParseException | OutOfStockException e) {
+                handleError(errors, productId, e);
+            }
         }
-        response.sendRedirect(request.getContextPath() + "/products/" + productId + "?message=Product added to cart");
+        if (errors.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/cart?message=Cart updated successfully");
+        } else {
+            request.setAttribute("errors", errors);
+            doGet(request, response);
+        }
     }
 
     private Long parseProductId(HttpServletRequest request) {
@@ -72,17 +72,16 @@ public class ProductDetailsPageServlet extends HttpServlet {
         return format.parse(quantityString).intValue();
     }
 
-    private void handleError(Exception e, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (e.getClass().equals(OutOfStockException.class)) {
+    private void handleError(Map<Long, String> errors, Long productId, Exception e) throws ServletException, IOException {
+        if (e.getClass().equals(ParseException.class)) {
+            errors.put(productId, "not a number");
+        } else {
             OutOfStockException outOfStockException = (OutOfStockException) e;
             if (outOfStockException.getStockRequested() <= 0) {
-                request.setAttribute("error", "Invalid value");
+                errors.put(productId, "Invalid value");
             } else {
-                request.setAttribute("error", "Out of stock, available: " + outOfStockException.getStockAvailable());
+                errors.put(productId, "Not enough stock, available: " + outOfStockException.getStockAvailable());
             }
-        } else {
-            request.setAttribute("error", "Not a number");
         }
-        doGet(request, response);
     }
 }

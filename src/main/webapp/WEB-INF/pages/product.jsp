@@ -61,6 +61,6 @@
         </table>
         <button>Add to cart</button>
     </form>
-    <tags:productDetails/>
+    <tags:RecentlyViewedProduct/>
 
 </tags:master>

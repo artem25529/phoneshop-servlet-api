@@ -20,8 +20,9 @@ import java.text.ParseException;
 import java.util.List;
 
 
-public class ProductDetailsPageServlet extends HttpServlet {
+public class AddCartItemFromSearchPage extends HttpServlet {
     private ProductDao productDao;
+
     private CartService cartService;
 
     @Override
@@ -34,22 +35,16 @@ public class ProductDetailsPageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long productId = parseProductId(request);
-        RecentlyViewedProductsService instance = RecentlyViewedProductsService.getInstance();
-        List<Product> recentlyViewedProducts = instance.getRecentlyViewedProducts(request);
-        instance.add(productId, recentlyViewedProducts);
+        request.setAttribute("id", productId);
         request.setAttribute("cart", cartService.getCart(request));
         request.setAttribute("product", productDao.getProduct(productId));
-        if (request.getParameter("updateFromSearchPage") != null) {
-            response.sendRedirect(request.getContextPath() + "/products");
-        } else {
-            request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
-        }
+        request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long productId = parseProductId(request);
-        String quantityString = request.getParameter("quantity");
+        String quantityString = request.getParameter("quantity." + productId);
         Cart cart = cartService.getCart(request);
         int quantity;
         try {
@@ -59,7 +54,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
             handleError(e, request, response);
             return;
         }
-        response.sendRedirect(request.getContextPath() + "/products/" + productId + "?message=Product added to cart");
+            response.sendRedirect(request.getContextPath() + "/products" + "?message=Product added to cart");
     }
 
     private Long parseProductId(HttpServletRequest request) {
