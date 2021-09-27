@@ -19,8 +19,11 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
 
+import static com.es.phoneshop.web.ProductListPageServlet.PRODUCT_LIST_JSP;
+
 
 public class ProductDetailsPageServlet extends HttpServlet {
+    protected static final String PRODUCT_JSP = "/WEB-INF/pages/product.jsp";
     private ProductDao productDao;
     private CartService cartService;
 
@@ -33,23 +36,31 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        boolean addFromSearchPage = Boolean.parseBoolean(request.getParameter("addFromSearchPage"));
         Long productId = parseProductId(request);
+        request.setAttribute("id", productId);
         RecentlyViewedProductsService instance = RecentlyViewedProductsService.getInstance();
         List<Product> recentlyViewedProducts = instance.getRecentlyViewedProducts(request);
         instance.add(productId, recentlyViewedProducts);
         request.setAttribute("cart", cartService.getCart(request));
         request.setAttribute("product", productDao.getProduct(productId));
-        if (request.getParameter("updateFromSearchPage") != null) {
-            response.sendRedirect(request.getContextPath() + "/products");
+        if (addFromSearchPage) {
+            request.getRequestDispatcher(PRODUCT_LIST_JSP).forward(request, response);
         } else {
-            request.getRequestDispatcher("/WEB-INF/pages/product.jsp").forward(request, response);
+            request.getRequestDispatcher(PRODUCT_JSP).forward(request, response);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        boolean addFromSearchPage = Boolean.parseBoolean(request.getParameter("addFromSearchPage"));
         Long productId = parseProductId(request);
-        String quantityString = request.getParameter("quantity");
+        String quantityString;
+        if (addFromSearchPage) {
+            quantityString = request.getParameter("quantity" + productId);
+        } else {
+            quantityString = request.getParameter("quantity");
+        }
         Cart cart = cartService.getCart(request);
         int quantity;
         try {
@@ -59,7 +70,13 @@ public class ProductDetailsPageServlet extends HttpServlet {
             handleError(e, request, response);
             return;
         }
-        response.sendRedirect(request.getContextPath() + "/products/" + productId + "?message=Product added to cart");
+        if (addFromSearchPage) {
+            response.sendRedirect(request.getContextPath() + "/products?message=Product added to cart?");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/products/" + productId + "?message=Product added to cart");
+        }
+
+
     }
 
     private Long parseProductId(HttpServletRequest request) {
@@ -73,7 +90,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
     }
 
     private void handleError(Exception e, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (e.getClass().equals(OutOfStockException.class)) {
+        if (e instanceof OutOfStockException) {
             OutOfStockException outOfStockException = (OutOfStockException) e;
             if (outOfStockException.getStockRequested() <= 0) {
                 request.setAttribute("error", "Invalid value");

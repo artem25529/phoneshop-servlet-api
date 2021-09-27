@@ -73,8 +73,8 @@
         <tr>
           <td></td>
           <td></td>
-          <td>Total cost: ${cart.totalCost}</td>
-          <td></td>
+          <td class="quantity">Total quantity: ${cart.totalQuantity}</td>
+          <td class="price">Total cost: <fmt:formatNumber value="${cart.totalCost}" type="currency" currencySymbol="${item.product.currency.symbol}"/></td>
         </tr>
       </table>
         <p><button>Update</button></p>

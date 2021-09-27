@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class ProductListPageServlet extends HttpServlet {
+    protected static final String PRODUCT_LIST_JSP = "/WEB-INF/pages/productList.jsp";
     private ProductDao productDao;
 
     @Override
@@ -35,8 +36,6 @@ public class ProductListPageServlet extends HttpServlet {
                 Optional.ofNullable(sortField).map(SortField::valueOf).orElse(null),
                 Optional.ofNullable(sortOrder).map(SortOrder::valueOf).orElse(null)
         ));
-        request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);
+        request.getRequestDispatcher(PRODUCT_LIST_JSP).forward(request, response);
     }
-
-
 }

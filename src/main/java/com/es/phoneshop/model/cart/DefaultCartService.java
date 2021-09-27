@@ -7,7 +7,6 @@ import com.es.phoneshop.model.product.ProductDao;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class DefaultCartService implements CartService {
     private final ProductDao productDao;
@@ -87,16 +86,14 @@ public class DefaultCartService implements CartService {
     }
 
     private void recalculateCart(Cart cart) {
-        cart.setTotalQuantity((cart.getItems().stream()
-                .map(CartItem::getQuantity)
-                .collect(Collectors.summingInt(q -> q.intValue()))));
-
+        int totalQuantity = cart.getItems().stream()
+                .mapToInt(CartItem::getQuantity)
+                .sum();
+        cart.setTotalQuantity(totalQuantity);
         BigDecimal totalCost = cart.getItems().stream()
                 .map(item -> item.getProduct().getPrice().multiply(new BigDecimal(item.getQuantity())))
                 .reduce(BigDecimal::add)
-                .get();
-
+                .orElse(new BigDecimal(0));
         cart.setTotalCost(totalCost);
-
     }
 }

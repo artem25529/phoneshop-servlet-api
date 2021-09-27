@@ -10,7 +10,7 @@
     Welcome to Expert-Soft training!
   </p>
   <p>
-    Cart: ${cart}
+    <a href="${pageContext.servletContext.contextPath}/cart">Cart</a>: ${cart}
   </p>
   <c:if test="${not empty param.message}">
     <p class="success">${param.message}</p>
@@ -18,7 +18,7 @@
   <c:if test="${not empty error}">
     <p class="error"> There was an error updating cart</p>
   </c:if>
-  <form>
+  <form action="${pageContext.servletContext.contextPath}/products">
       <input name="query" value="${param.query}" placeholder="Search product...">
       <button>Search</button>
   </form>
@@ -51,7 +51,7 @@
           </a>
         </td>
         <td>
-          <input value="1" class="quantity" size="5px" form="addToCart" name="quantity.${product.id}">
+          <input value="1" class="quantity" size="5px" form="addToCart" name="quantity${product.id}">
           <c:if test="${not empty error and id eq product.id}">
             <div class="error">${error}</div>
           </c:if>
@@ -60,7 +60,7 @@
           <a href="${pageContext.servletContext.contextPath}/priceHistories/${product.id}"><fmt:formatNumber value="${product.price}" type="currency" currencySymbol="${product.currency.symbol}"/></a><br>
         </td>
         <td>
-          <button form="addToCart" formaction="${pageContext.servletContext.contextPath}/addFromSearchPage/${product.id}">Add to cart</button>
+          <button form="addToCart" formaction="${pageContext.servletContext.contextPath}/products/${product.id}?addFromSearchPage=true">Add to cart</button>
         </td>
       </tr>
     </c:forEach>
