@@ -15,12 +15,12 @@ public class DefaultCartService implements CartService {
         productDao = ArrayListProductDao.getInstance();
     }
 
-    private static class SingleTonHelper {
+    private static class SingletonHelper {
         private static final CartService INSTANCE = new DefaultCartService();
     }
 
     public static CartService getInstance() {
-        return DefaultCartService.SingleTonHelper.INSTANCE;
+        return SingletonHelper.INSTANCE;
     }
 
     @Override

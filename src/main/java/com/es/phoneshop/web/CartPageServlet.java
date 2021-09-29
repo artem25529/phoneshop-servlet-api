@@ -36,6 +36,10 @@ public class CartPageServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String[] productIds = request.getParameterValues("productId");
+        if (productIds == null) {
+            doGet(request, response);
+            return;
+        }
         String[] quantities = request.getParameterValues("quantity");
         Map<Long, String> errors = new HashMap<>();
         Cart cart = cartService.getCart(request);

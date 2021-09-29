@@ -17,12 +17,12 @@ public class ArrayListProductDao implements ProductDao {
     private final Lock readLock;
     private final Lock writeLock;
 
-    private static class SingleTonHelper {
+    private static class SingletonHelper {
         private static final ProductDao INSTANCE = new ArrayListProductDao();
     }
 
     public static ProductDao getInstance() {
-        return SingleTonHelper.INSTANCE;
+        return SingletonHelper.INSTANCE;
     }
 
     private ArrayListProductDao() {

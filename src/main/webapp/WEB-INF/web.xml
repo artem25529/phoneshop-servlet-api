@@ -74,16 +74,6 @@
     <url-pattern>/cart/minicart</url-pattern>
   </servlet-mapping>
 
-  <servlet>
-    <servlet-name>addCartItemFromSearchPage</servlet-name>
-    <servlet-class>com.es.phoneshop.web.AddCartItemFromSearchPage</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>addCartItemFromSearchPage</servlet-name>
-    <url-pattern>/addFromSearchPage/*</url-pattern>
-  </servlet-mapping>
-
   <error-page>
     <exception-type>com.es.phoneshop.model.product.ProductNotFoundException</exception-type>
     <location>/WEB-INF/pages/errorProductNotFound.jsp</location>
