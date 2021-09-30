@@ -11,20 +11,19 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ArrayListProductDao implements ProductDao {
-    private static ProductDao instance;
-
-    public static synchronized ProductDao getInstance() {
-        if (instance == null) {
-            instance = new ArrayListProductDao();
-        }
-        return instance;
-    }
-
     private long maxId;
     private final List<Product> products;
     private final ReadWriteLock lock;
     private final Lock readLock;
     private final Lock writeLock;
+
+    private static class SingletonHelper {
+        private static final ProductDao INSTANCE = new ArrayListProductDao();
+    }
+
+    public static ProductDao getInstance() {
+        return SingletonHelper.INSTANCE;
+    }
 
     private ArrayListProductDao() {
         lock = new ReentrantReadWriteLock();
@@ -74,7 +73,7 @@ public class ArrayListProductDao implements ProductDao {
             }
 
         });
-        if (query != null && !query.equals("")) return getSearchComparator(query).reversed();
+        if (sortField == null && query != null && !query.isEmpty()) return getSearchComparator(query).reversed();
         return sortOrder == SortOrder.asc ? comparator : comparator.reversed();
     }
 

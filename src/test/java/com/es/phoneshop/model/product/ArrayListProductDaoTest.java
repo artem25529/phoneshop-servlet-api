@@ -25,7 +25,7 @@ public class ArrayListProductDaoTest
 
     @Test
     public void testFindProductsNoResults() {
-        assertFalse(productDao.findProducts(null, null, null).isEmpty());
+        assertTrue(productDao.findProducts(null, null, null).isEmpty());
     }
 
     @Test
@@ -50,7 +50,7 @@ public class ArrayListProductDaoTest
     @Test
     public void testDeleteProduct() throws ProductNotFoundException {
         productDao.save(testProduct);
-        assertTrue(testProduct.getId() > 0);
+        assertTrue(testProduct.getId() >= 0);
         assertNotNull(productDao.getProduct(testProduct.getId()));
         productDao.delete(testProduct.getId());
         Throwable thrown = catchThrowable(() -> productDao.getProduct(testProduct.getId()));

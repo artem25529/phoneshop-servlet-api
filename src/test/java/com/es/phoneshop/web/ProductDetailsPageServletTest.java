@@ -10,6 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -19,30 +20,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ProductDetailsPageServletTest {
-
     @Mock
     private HttpServletRequest request;
-
     @Mock
     private HttpServletResponse response;
-
     @Mock
     private RequestDispatcher requestDispatcher;
-
     @Mock
     private ServletConfig config;
-
     @Mock
     private ServletContextEvent event;
-
     @Mock
     private ServletContext context;
+    @Mock
+    private HttpSession session;
 
-    DemoDataServletContextListener listener = new DemoDataServletContextListener();
-
+    private DemoDataServletContextListener listener = new DemoDataServletContextListener();
     private final ProductDetailsPageServlet servlet = new ProductDetailsPageServlet();
-
-
 
     @Before
     public void setUp() throws Exception {
@@ -53,6 +47,7 @@ public class ProductDetailsPageServletTest {
         servlet.init(config);
         when(request.getPathInfo()).thenReturn("/1");
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
+        when(request.getSession()).thenReturn(session);
     }
 
     @Test
