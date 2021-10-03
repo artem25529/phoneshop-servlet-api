@@ -1,12 +1,14 @@
 package com.es.phoneshop.model.product;
 
+import com.es.phoneshop.model.dao.AbstractDao;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 
-public class Product implements Serializable {
+public class Product implements Serializable, AbstractDao {
     private Long id;
     private String code;
     private String description;

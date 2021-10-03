@@ -35,7 +35,7 @@ public class RecentlyViewedProductsService {
     }
 
     public void add (Long productId, List<Product> recentlyViewedProducts) {
-        Product product = productDao.getProduct(productId);
+        Product product = productDao.get(productId);
         recentlyViewedProducts.remove(product);
         recentlyViewedProducts.add(0, product);
         if (recentlyViewedProducts.size() > 3) {

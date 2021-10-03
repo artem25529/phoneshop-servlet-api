@@ -42,7 +42,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
         List<Product> recentlyViewedProducts = instance.getRecentlyViewedProducts(request);
         instance.add(productId, recentlyViewedProducts);
         request.setAttribute("cart", cartService.getCart(request));
-        request.setAttribute("product", productDao.getProduct(productId));
+        request.setAttribute("product", productDao.get(productId));
         request.getRequestDispatcher(PRODUCT_JSP).forward(request, response);
     }
 
