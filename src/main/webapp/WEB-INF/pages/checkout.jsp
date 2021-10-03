@@ -87,7 +87,7 @@
         <tags:orderFormRow name="firstName" label="First Name" order="${order}" errors="${errors}"/>
         <tags:orderFormRow name="lastName" label="Last Name" order="${order}" errors="${errors}"/>
         <tags:orderFormRow name="phone" label="Phone" order="${order}" errors="${errors}"/>
-        <tags:orderFormRow name="deliveryDate" label="Delivery Date" order="${order}" errors="${errors}"/>
+        <tags:orderFormRow name="deliveryDate" label="Delivery Date" order="${order}" errors="${errors}" placeholder="04.10.2021"/>
         <tags:orderFormRow name="deliveryAddress" label="Delivery Address" order="${order}" errors="${errors}"/>
         <tr>
           <td>Payment method<span style="color: red">*</span></td>

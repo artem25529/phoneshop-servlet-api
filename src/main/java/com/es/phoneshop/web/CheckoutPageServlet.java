@@ -3,7 +3,6 @@ package com.es.phoneshop.web;
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartService;
 import com.es.phoneshop.model.cart.DefaultCartService;
-import com.es.phoneshop.model.cart.OutOfStockException;
 import com.es.phoneshop.model.order.DefaultOrderService;
 import com.es.phoneshop.model.order.Order;
 import com.es.phoneshop.model.order.OrderService;
@@ -15,9 +14,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -56,23 +56,14 @@ public class CheckoutPageServlet extends HttpServlet {
         setRequiredParameter(request, "deliveryAddress", errors, order::setDeliveryAddress);
         setPaymentMethod(request, errors, order);
         setDeliveryDate(request, errors, order);
-
         handleErrors(request, response, errors, order);
-    }
-
-    private LocalDate getDeliveryDate(HttpServletRequest request) {
-        String deliveryDateString = request.getParameter("deliveryDate");
-        int day = Integer.parseInt(deliveryDateString.substring(0, 2));
-        int month = Integer.parseInt(deliveryDateString.substring(3, 5));
-        int year = Integer.parseInt(deliveryDateString.substring(6, 10));
-        return LocalDate.of(year, month, day);
     }
 
     private void setRequiredParameter(HttpServletRequest request, String parameter, Map<String, String> errors,
                                       Consumer<String> consumer) {
         String value = request.getParameter(parameter);
         if (value == null || value.isEmpty()) {
-            errors.put(parameter, "Value name is required");
+            errors.put(parameter, "Value is required");
         } else {
             consumer.accept(value);
         }
@@ -93,24 +84,12 @@ public class CheckoutPageServlet extends HttpServlet {
             errors.put("deliveryDate", "Value is required");
         } else {
             try {
-                int day = Integer.parseInt(deliveryDate.substring(0, 2));
-                int month = Integer.parseInt(deliveryDate.substring(3, 5));
-                int year = Integer.parseInt(deliveryDate.substring(6, 10));
-                order.setDeliveryDate(LocalDate.of(year, month, day));
-            } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                LocalDate date = LocalDate.parse(deliveryDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                order.setDeliveryDate(date);
+            } catch (DateTimeParseException e) {
                 errors.put("deliveryDate", "Wrong date format");
             }
         }
-    }
-
-    private Long parseProductId(HttpServletRequest request) {
-        String productInfo = request.getPathInfo().substring(1);
-        return Long.valueOf(productInfo);
-    }
-
-    private int getQuantity(String quantityString, HttpServletRequest request) throws ParseException {
-        NumberFormat format = NumberFormat.getInstance(request.getLocale());
-        return format.parse(quantityString).intValue();
     }
 
     private void handleErrors(HttpServletRequest request, HttpServletResponse response, Map<String, String> errors,

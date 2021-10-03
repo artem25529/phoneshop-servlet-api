@@ -1,11 +1,7 @@
 package com.es.phoneshop.model.order;
 
-import com.es.phoneshop.model.dao.AbstractDao;
-import com.es.phoneshop.model.dao.GenericDao;
+import com.es.phoneshop.model.dao.Dao;
 
-public interface OrderDao extends GenericDao<Order> {
-   // Order getOrder(Long id) throws OrderNotFoundException;
+public interface OrderDao extends Dao<Order> {
     Order getOrderBySecureId(String secureId) throws OrderNotFoundException;
-    //void save(Order order);
-
 }

@@ -1,6 +1,6 @@
 package com.es.phoneshop.model.product;
 
-import com.es.phoneshop.model.dao.AbstractDao;
+import com.es.phoneshop.model.dao.DaoEntity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 
-public class Product implements Serializable, AbstractDao {
+public class Product implements Serializable, DaoEntity {
     private Long id;
     private String code;
     private String description;
@@ -127,5 +127,9 @@ public class Product implements Serializable, AbstractDao {
 
     public void setPriceHistories(List<PriceHistory> priceHistories) {
         this.priceHistories = priceHistories;
+    }
+
+    public RuntimeException getException() {
+        return new ProductNotFoundException();
     }
 }

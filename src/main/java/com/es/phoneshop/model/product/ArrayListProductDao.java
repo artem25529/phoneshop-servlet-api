@@ -1,6 +1,6 @@
 package com.es.phoneshop.model.product;
 
-import com.es.phoneshop.model.dao.GenericDaoImpl;
+import com.es.phoneshop.model.dao.GenericDao;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ArrayListProductDao extends GenericDaoImpl<Product> implements ProductDao {
+public class ArrayListProductDao extends GenericDao<Product> implements ProductDao {
     private final List<Product> products;
     private final ReadWriteLock lock;
     private final Lock readLock;

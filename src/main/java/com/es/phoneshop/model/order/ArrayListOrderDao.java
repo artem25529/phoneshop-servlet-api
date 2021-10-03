@@ -1,6 +1,6 @@
 package com.es.phoneshop.model.order;
 
-import com.es.phoneshop.model.dao.GenericDaoImpl;
+import com.es.phoneshop.model.dao.GenericDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class ArrayListOrderDao extends GenericDaoImpl<Order> implements OrderDao {
+public class ArrayListOrderDao extends GenericDao<Order> implements OrderDao {
 
     private final List<Order> orderList;
     private final ReadWriteLock lock;

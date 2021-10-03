@@ -1,12 +1,12 @@
 package com.es.phoneshop.model.order;
 
 import com.es.phoneshop.model.cart.Cart;
-import com.es.phoneshop.model.dao.AbstractDao;
+import com.es.phoneshop.model.dao.DaoEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Order extends Cart implements AbstractDao {
+public class Order extends Cart implements DaoEntity {
     private Long id;
     private String secureId;
     private BigDecimal subTotal;
@@ -91,6 +91,11 @@ public class Order extends Cart implements AbstractDao {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public RuntimeException getException() {
+        return new OrderNotFoundException();
     }
 
     public String getSecureId() {

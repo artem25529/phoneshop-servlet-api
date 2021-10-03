@@ -47,7 +47,7 @@ public class DefaultOrderService implements OrderService {
         orderDao.save(order);
     }
 
-    protected BigDecimal calculateDeliveryCost() {
+    private BigDecimal calculateDeliveryCost() {
         return new BigDecimal(5);
     }
 
