@@ -1,5 +1,7 @@
 package com.es.phoneshop.model.product;
 
+import com.es.phoneshop.model.dao.GenericDao;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -10,8 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ArrayListProductDao implements ProductDao {
-    private long maxId;
+public class ArrayListProductDao extends GenericDao<Product> implements ProductDao {
     private final List<Product> products;
     private final ReadWriteLock lock;
     private final Lock readLock;
@@ -33,27 +34,12 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public Product getProduct(Long id) throws ProductNotFoundException {
-        readLock.lock();
-        Product result;
-        try {
-            result = products.stream()
-                    .filter(product -> id.equals(product.getId()))
-                    .findAny()
-                    .orElseThrow(() -> new ProductNotFoundException(id));
-        } finally {
-            readLock.unlock();
-        }
-        return result;
-    }
-
-    @Override
     public List<Product> findProducts(String query, SortField sortField, SortOrder sortOrder) {
         lock.readLock().lock();
         List<Product> result;
         try {
             Comparator<Product> comparator = getComparator(query, sortField, sortOrder);
-            result = products.stream()
+            result = itemsList.stream()
                     .filter(product -> query == null || query.isEmpty() || queryMatchesDescription(query, product))
                     .filter(product -> product.getPrice() != null && productIsInStock(product))
                     .sorted(comparator)
@@ -92,25 +78,13 @@ public class ArrayListProductDao implements ProductDao {
         return product.getStock() > 0;
     }
 
-    @Override
-    public void save(Product product) {
-        writeLock.lock();
-        try {
-            if (product.getId() == null) {
-                product.setId(maxId++);
-            }
-            products.add(product);
-        } finally {
-            writeLock.unlock();
-        }
-    }
 
     @Override
-    public void delete(Long id) throws ProductNotFoundException {
+    public void delete(Long id) throws Exception {
         writeLock.lock();
         try {
-            Product product = getProduct(id);
-            products.remove(product);
+            Product product = get(id);
+            itemsList.remove(product);
         } finally {
             writeLock.unlock();
         }

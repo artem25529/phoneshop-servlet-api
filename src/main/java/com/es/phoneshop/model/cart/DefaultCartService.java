@@ -34,7 +34,7 @@ public class DefaultCartService implements CartService {
 
     @Override
     public synchronized void add(Cart cart, Long productId, int quantity) throws OutOfStockException {
-        Product product = productDao.getProduct(productId);
+        Product product = productDao.get(productId);
         Optional<CartItem> optional = findCartItemForUpdate(cart, productId, quantity);
         int productsAmount = optional.map(CartItem::getQuantity).orElse(0);
         if (product.getStock() < quantity + productsAmount) {
@@ -50,7 +50,7 @@ public class DefaultCartService implements CartService {
 
     @Override
     public synchronized void update(Cart cart, Long productId, int quantity) throws OutOfStockException {
-        Product product = productDao.getProduct(productId);
+        Product product = productDao.get(productId);
         Optional<CartItem> optional = findCartItemForUpdate(cart, productId, quantity);
         if (product.getStock() < quantity) {
             throw new OutOfStockException(product, quantity, product.getStock());
@@ -70,11 +70,16 @@ public class DefaultCartService implements CartService {
         recalculateCart(cart);
     }
 
+    @Override
+    public void clearCart(Cart cart) {
+        cart.removeItems();
+    }
+
     private Optional<CartItem> findCartItemForUpdate(Cart cart, Long productId, int quantity) throws OutOfStockException {
         if (quantity <= 0) {
             throw new OutOfStockException(null, quantity, 0);
         }
-        Product product = productDao.getProduct(productId);
+        Product product = productDao.get(productId);
         Optional<CartItem> optional = cart.getItems().stream()
                 .filter(item -> product.getId().equals(item.getProduct().getId()))
                 .findAny();
