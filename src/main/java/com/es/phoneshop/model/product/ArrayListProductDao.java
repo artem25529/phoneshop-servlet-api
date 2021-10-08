@@ -1,8 +1,10 @@
 package com.es.phoneshop.model.product;
 
 import com.es.phoneshop.model.dao.GenericDao;
+import com.es.phoneshop.web.SearchType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -31,6 +33,39 @@ public class ArrayListProductDao extends GenericDao<Product> implements ProductD
         readLock = lock.readLock();
         writeLock = lock.writeLock();
         products = new ArrayList<>();
+    }
+
+    @Override
+    public List<Product> findProductsAdvancedSearch(String description, SearchType searchType, int minPrice, int maxPrice) {
+        readLock.lock();
+        List<Product> result;
+        try {
+            result = itemsList.stream()
+                    .filter(item -> description == null || description.isEmpty() || descriptionMatches(description, item, searchType))
+                    .filter(item -> priceMatches(item, minPrice, maxPrice))
+                    .collect(Collectors.toList());
+
+        } finally {
+            readLock.unlock();
+        }
+        return result;
+    }
+
+    private boolean priceMatches(Product product, int minPrice, int maxPrice) {
+        double productPrice = product.getPrice().doubleValue();
+        return productPrice > minPrice && productPrice <= maxPrice;
+    }
+
+    private boolean descriptionMatches (String query, Product product, SearchType searchType) {
+        String description = product.getDescription().toLowerCase();
+        String[] words = query.trim().toLowerCase().split(" ");
+        boolean matches;
+        if (searchType == SearchType.any_word) {
+            matches = Arrays.stream(words).anyMatch(description::contains);
+        } else {
+            matches = Arrays.stream(words).allMatch(description::contains);
+        }
+        return matches;
     }
 
     @Override

@@ -22,6 +22,9 @@
       <input name="query" value="${param.query}" placeholder="Search product...">
       <button>Search</button>
   </form>
+  <form>
+    <button formaction="preAdvancedSearch">Advanced search</button>
+  </form>
   <table>
     <thead>
     <tr>
